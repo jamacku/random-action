@@ -1,0 +1,16 @@
+---
+
+name: Testing Farm in TypeScript PoC
+
+description: Please do not use this action in production
+
+inputs:
+  pr:
+    required: true
+    description: Pull request number
+
+runs:
+  using: 'node16'
+  main: 'dist/index.js'
+
+...
