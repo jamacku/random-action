@@ -8,6 +8,10 @@ inputs:
   pr:
     required: true
     description: Pull request number
+  token:
+    required: true
+    default: ${{ github.token }}
+    description: GitHub token
 
 runs:
   using: 'node16'
