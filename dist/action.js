@@ -12,16 +12,18 @@ const action = (probot) => {
             throw new Error('Could not get commits');
         }
         const lastCommit = data[data.length - 1];
-        for (const version of config.matrix.version) {
-            for (const os of config.matrix.os_test) {
-                for (const testCase of config.matrix.test_case) {
-                    await context.octokit.repos.createCommitStatus(context.repo({
-                        state: 'pending',
-                        sha: lastCommit.sha,
-                        description: 'Test has started',
-                        context: `${os} - v${version} - test ${testCase}`,
-                        target_url: 'https://github.com/actions-private-playground/test-random-action',
-                    }));
+        for (const matrix of config.matrix) {
+            for (const version of matrix.version) {
+                for (const os of matrix.os_test) {
+                    for (const testCase of matrix.test_case) {
+                        await context.octokit.repos.createCommitStatus(context.repo({
+                            state: 'pending',
+                            sha: lastCommit.sha,
+                            description: 'Test has started',
+                            context: `${os} - v${version} - test ${testCase}`,
+                            target_url: 'https://github.com/actions-private-playground/test-random-action',
+                        }));
+                    }
                 }
             }
         }
@@ -29,23 +31,25 @@ const action = (probot) => {
         const results = [];
         // ! This is just for DEMO purposes
         setTimeout(async () => {
-            for (const version of config.matrix.version) {
-                for (const os of config.matrix.os_test) {
-                    for (const testCase of config.matrix.test_case) {
-                        const { state, description } = Math.random() > 0.5
-                            ? { state: 'success', description: 'All OK' }
-                            : {
-                                state: 'failure',
-                                description: 'Something went wrong',
-                            };
-                        results.push([`${os} - v${version} - test ${testCase}`, state]);
-                        await context.octokit.repos.createCommitStatus(context.repo({
-                            state,
-                            sha: lastCommit.sha,
-                            description: description,
-                            context: `${os} - v${version} - test ${testCase}`,
-                            target_url: 'https://github.com/actions-private-playground/test-random-action',
-                        }));
+            for (const matrix of config.matrix) {
+                for (const version of matrix.version) {
+                    for (const os of matrix.os_test) {
+                        for (const testCase of matrix.test_case) {
+                            const { state, description } = Math.random() > 0.5
+                                ? { state: 'success', description: 'All OK' }
+                                : {
+                                    state: 'failure',
+                                    description: 'Something went wrong',
+                                };
+                            results.push([`${os} - v${version} - test ${testCase}`, state]);
+                            await context.octokit.repos.createCommitStatus(context.repo({
+                                state,
+                                sha: lastCommit.sha,
+                                description: description,
+                                context: `${os} - v${version} - test ${testCase}`,
+                                target_url: 'https://github.com/actions-private-playground/test-random-action',
+                            }));
+                        }
                     }
                 }
             }
